@@ -12,6 +12,10 @@ public class Reader {
     static int maximum_index = -1;
     //read the number of  partial siddhi apps from configuration files
     static int no_of_partial_siddhi_apps = 2;
+    static int no_of_nodes = 2;
+    static String worker1 = "wso2sp-worker-1";
+    static String worker2 = "wso2sp-worker-2";
+    static String worker3 = "wso2sp-worker-3";
 
 
     public static void main(String args[]) {
@@ -42,7 +46,8 @@ public class Reader {
 
             // run the deploy.sh files
 
-            ProcessBuilder pb = new ProcessBuilder("bash", "/home/winma/Documents/BashClient/ML/PredictionsReader/src/auto_deploy.sh", records.get(maximum_index).get(1));
+            ProcessBuilder pb = new ProcessBuilder("bash", "/home/winma/Documents/BashClient/ML/Chulani/Mavericks-Kubernetes-Client-for-WSO2-Stream-Processor/pattern-distributed/scripts/auto_deploy.sh",
+                    records.get(maximum_index).get(1));
             Process p = pb.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = null;
@@ -59,27 +64,33 @@ public class Reader {
 
             while (true) {
                 // check whether all the partial siddhi apps are deployed
-                ProcessBuilder pb_new = new ProcessBuilder("bash", "/home/winma/Documents/BashClient/ML/PredictionsReader/src/observe_siddhi_apps_are_deployed.sh", records.get(maximum_index).get(1));
-                Process p_new = pb_new.start();
-                BufferedReader reader_new = new BufferedReader(new InputStreamReader(p_new.getInputStream()));
-                String line_new ;
-                String app_count = null;
-                while ((line_new = reader_new.readLine()) != null) {
-                    if (line_new != null){
-                        app_count = line_new;
-                    }
 
-                }
-                Thread.sleep(20000);
-                System.out.println("Thread Sleeping ................");
-                int siddhi_apps_count = 0;
-                siddhi_apps_count = Integer.parseInt(app_count);
+//                ProcessBuilder pb_new = new ProcessBuilder("bash", "/home/winma/Documents/BashClient/ML/PredictionsReader/src/observe_siddhi_apps_are_deployed.sh", records.get(maximum_index).get(1));
+//                Process p_new = pb_new.start();
+//                BufferedReader reader_new = new BufferedReader(new InputStreamReader(p_new.getInputStream()));
+//                String line_new ;
+//                String app_count = null;
+//                while ((line_new = reader_new.readLine()) != null) {
+//                    if (line_new != null){
+//                        app_count = line_new;
+//                    }
+//
+//                }
+
+//                System.out.println("Thread Sleeping ................");
+//                int siddhi_apps_count = 0;
+//                siddhi_apps_count = Integer.parseInt(app_count);
 
 
-                if (siddhi_apps_count == no_of_partial_siddhi_apps) {
+
                     // call the undeploy script
                     System.out.println("Calling the undeploy file .................");
-                }
+                    ProcessBuilder pb_undeploy = new ProcessBuilder("bash", "/home/winma/Documents/BashClient/ML/Chulani/Mavericks-Kubernetes-Client-for-WSO2-Stream-Processor/pattern-distributed/scripts/observe-undeploy.sh",
+                            Integer.toString(no_of_nodes), Integer.toString(no_of_partial_siddhi_apps), worker1, worker2, worker3);
+                    pb_undeploy.start();
+
+                Thread.sleep(20000);
+
 
             }
 
